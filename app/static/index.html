@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Snip — короткие ссылки</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="logo" href="/">✂ snip</a>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Сократить ссылку</h1>
+      <p class="subtitle">Вставь длинную ссылку — получишь короткую, QR-код и статистику переходов.</p>
+    </section>
+
+    <section class="card">
+      <form id="shorten-form" autocomplete="off">
+        <div class="input-row">
+          <input id="url" type="url" placeholder="https://..." required>
+          <button class="btn btn-primary" type="submit" id="submit-btn">Сократить</button>
+        </div>
+        <details class="advanced">
+          <summary>Дополнительные настройки</summary>
+          <div class="advanced-grid">
+            <label>Свой адрес (необязательно)
+              <div class="prefix-input"><span id="host-prefix"></span><input id="alias" type="text" placeholder="my-link" maxlength="32"></div>
+              <small>Вместо случайного кода, например <b>/summer-sale</b>. 3–32 символа: буквы, цифры, «-» и «_».</small>
+            </label>
+            <label>Срок действия
+              <select id="expires">
+                <option value="">Бессрочно</option>
+                <option value="1">1 день</option>
+                <option value="7">7 дней</option>
+                <option value="30">30 дней</option>
+                <option value="365">1 год</option>
+              </select>
+              <small>После этого срока ссылка перестанет открываться.</small>
+            </label>
+          </div>
+        </details>
+        <p class="form-error" id="form-error" role="alert"></p>
+      </form>
+
+      <div class="result hidden" id="result">
+        <div class="result-info">
+          <span class="result-label">Твоя короткая ссылка:</span>
+          <a id="result-link" class="result-link" target="_blank" rel="noopener"></a>
+          <div class="result-actions">
+            <button class="btn" id="copy-btn" type="button">Копировать</button>
+            <button class="btn" id="result-stats-btn" type="button">Статистика</button>
+            <a class="btn" id="qr-download" download>Скачать QR</a>
+          </div>
+        </div>
+        <div class="qr-box"><img id="qr-img" alt="QR-код"></div>
+      </div>
+    </section>
+
+    <section class="links-section">
+      <div class="section-head">
+        <h2>Последние ссылки</h2>
+        <button class="btn btn-sm" id="refresh-btn" type="button">Обновить</button>
+      </div>
+      <div id="links-list" class="links-list"></div>
+      <p class="empty hidden" id="links-empty">Пока ссылок нет.</p>
+    </section>
+  </main>
+
+  <div class="modal hidden" id="stats-modal" role="dialog" aria-modal="true" aria-labelledby="stats-title">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-content">
+      <button class="modal-close" data-close aria-label="Закрыть">✕</button>
+      <h2 id="stats-title"></h2>
+      <a id="stats-original" class="muted-link" target="_blank" rel="noopener"></a>
+      <div class="kpis">
+        <div class="kpi"><span class="kpi-value" id="kpi-total">0</span><span class="kpi-label">всего кликов</span></div>
+        <div class="kpi"><span class="kpi-value" id="kpi-today">0</span><span class="kpi-label">сегодня</span></div>
+        <div class="kpi"><span class="kpi-value" id="kpi-top-device">—</span><span class="kpi-label">топ устройство</span></div>
+      </div>
+      <div class="chart-card"><h4>Клики за 30 дней</h4><div class="chart-wrap"><canvas id="chart-days"></canvas></div></div>
+      <div class="breakdowns">
+        <div class="chart-card"><h4>Устройства</h4><div id="bd-devices" class="bars"></div></div>
+        <div class="chart-card"><h4>Браузеры</h4><div id="bd-browsers" class="bars"></div></div>
+        <div class="chart-card"><h4>ОС</h4><div id="bd-os" class="bars"></div></div>
+        <div class="chart-card"><h4>Откуда пришли</h4><div id="bd-referrers" class="bars"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</body>
+</html>
